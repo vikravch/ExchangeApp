@@ -19,10 +19,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.currentStateAsState
 import com.vikravch.exchangeapp.currency_converter.presentation.ui.theme.ExchangeAppTheme
 import kotlinx.coroutines.delay
 import timber.log.Timber
@@ -50,8 +53,11 @@ fun ConversionDashboardPage(
         }
     }
 
-    LaunchedEffect(Unit) {
-        while(true) {
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val currentLifecycleState = lifecycleOwner.lifecycle.currentStateAsState()
+
+    LaunchedEffect(key1 =  currentLifecycleState.value) {
+        while(currentLifecycleState.value.isAtLeast(Lifecycle.State.STARTED)) {
             viewModel.onEvent(ConversionDashboardEvent.GetCurrencies)
             delay(5000)
         }

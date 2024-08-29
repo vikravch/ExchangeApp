@@ -3,7 +3,8 @@ package com.vikravch.exchangeapp.currency_converter
 import com.vikravch.exchangeapp.currency_converter.data.fake.repository.AmountFakeRepository
 import com.vikravch.exchangeapp.currency_converter.data.fake.repository.ExchangeFakeRepository
 import com.vikravch.exchangeapp.currency_converter.data.fake.repository.TransactionHistoryCollectionRepository
-import com.vikravch.exchangeapp.currency_converter.domain.use_case.ConvertAmountUseCase
+import com.vikravch.exchangeapp.currency_converter.domain.use_case.CalculateUniversalUseCase
+import com.vikravch.exchangeapp.currency_converter.domain.use_case.ConvertAmountProcessingUseCase
 import kotlinx.coroutines.runBlocking
 
 fun main(){
@@ -11,22 +12,38 @@ fun main(){
     val amountRepository = AmountFakeRepository()
     val transactionsHistoryRepository = TransactionHistoryCollectionRepository()
 
-    val convertAmountUseCase = ConvertAmountUseCase(
+    val convertAmountProcessingUseCase = ConvertAmountProcessingUseCase(
         amountRepository,
         transactionsHistoryRepository
     )
+    val calculateUniversalUseCase = CalculateUniversalUseCase()
     runBlocking {
-        println(convertAmountUseCase(200.0, 1.0,"EUR", "USD", 200.0))
+        println(convertAmountProcessingUseCase(200.0, "EUR", "USD"))
         println(amountRepository.getAmounts())
-        println(transactionsHistoryRepository.getAllTransactions().getOrNull())
-        println(convertAmountUseCase(300.0, 1.0, "EUR", "GBP", 200.0))
-        println(transactionsHistoryRepository.getAllTransactions().getOrNull())
-        println(amountRepository.getAmounts())
-        println(convertAmountUseCase(500.0, 1.0, "EUR", "USD", 200.0))
-        println(transactionsHistoryRepository.getAllTransactions().getOrNull())
-        println(amountRepository.getAmounts())
-        println(convertAmountUseCase(500.0, 1.0, "EUR", "GBP", 200.0))
-        println(transactionsHistoryRepository.getAllTransactions().getOrNull())
-        println(amountRepository.getAmounts())
+        val rates = exchangeRepository.getRates().getOrNull()?: emptyMap()
+        println("1000 EUR to USD - "+
+            calculateUniversalUseCase(
+                1000.0,
+                rates,
+                "EUR",
+                "USD"
+            )
+        )
+        println("1000 USD to EUR - "+
+            calculateUniversalUseCase(
+                1000.0,
+                rates,
+                "USD",
+                "EUR"
+            )
+        )
+        println("1000 GBP to USD - "+
+            calculateUniversalUseCase(
+                1000.0,
+                rates,
+                "GBP",
+                "USD"
+            )
+        )
     }
 }

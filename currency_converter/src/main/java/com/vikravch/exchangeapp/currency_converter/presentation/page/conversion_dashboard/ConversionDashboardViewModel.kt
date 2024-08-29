@@ -1,5 +1,6 @@
 package com.vikravch.exchangeapp.currency_converter.presentation.page.conversion_dashboard
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -33,58 +34,38 @@ class ConversionDashboardViewModel @Inject constructor(
             }
             is ConversionDashboardEvent.ConvertAmount -> {
                 viewModelScope.launch {
-                    var amount = event.amount
-                    if (event.fromCurrency != "EUR"){
-                        amount = currencyConverterUseCases.calculateConvertedToEuroAmountUseCase(
-                            amount = event.amount,
-                            rate = state.currencies[event.fromCurrency]?.rate?: 0.0,
-                            feeAmount = 0.0
-                        )
-                    }
+                    val amountAfterConvertion = currencyConverterUseCases.calculateUniversalUseCase(
+                        amount = event.amount,
+                        fromCurrency = event.fromCurrency,
+                        toCurrency = event.toCurrency,
+                        currencies = state.currencies
+                    )
 
-                   if (event.toCurrency != "EUR") {
-                        val conversionResponse = currencyConverterUseCases.convertAmountUseCase(
-                            amount = event.amount,
-                            from = event.fromCurrency,
-                            to = event.toCurrency,
-                            rate = state.currencies[event.toCurrency]?.rate ?: 0.0,
-                            amountEUR = amount
-                        )
-                        if (conversionResponse.isSuccess) {
-                            _uiEvent.send(UiEvent.ConversionSuccess("Conversion successful"))
-                        } else {
-                            _uiEvent.send(UiEvent.ConversionError("Conversion failed"))
-                        }
-                    } else {
+                    val conversionResponse = currencyConverterUseCases.convertAmountProcessingUseCase(
+                        from = event.fromCurrency,
+                        to = event.toCurrency,
+                        convertedAmount = amountAfterConvertion
+                    )
+                    if (conversionResponse.isSuccess) {
                         _uiEvent.send(UiEvent.ConversionSuccess("Conversion successful"))
-                   }
-
-
-                    val amounts = currencyConverterUseCases.getAmountsUseCase().getOrNull()?: emptyList()
-                    state = state.copy(amountsStatus = amounts)
+                    } else {
+                        _uiEvent.send(UiEvent.ConversionError("Conversion failed"))
+                    }
                 }
             }
 
             is ConversionDashboardEvent.UpdateReceiveValue -> {
                 viewModelScope.launch {
-                    var amount = event.value
-                    if (event.fromCurrency != "EUR") {
-                        amount = currencyConverterUseCases.calculateConvertedAmountUseCase(
-                            amount = amount,
-                            rate = state.currencies[event.fromCurrency]?.rate ?: 0.0,
-                            feeAmount = 0.0
-                        )
-                    }
-
-                    val conversionResult = currencyConverterUseCases.calculateConvertedAmountUseCase(
-                        amount = amount,
-                        rate = state.currencies[event.toCurrency]?.rate ?: 0.0,
-                        feeAmount = 0.0
+                    val amountAfterConvertion = currencyConverterUseCases.calculateUniversalUseCase(
+                        amount = event.value,
+                        fromCurrency = event.fromCurrency,
+                        toCurrency = event.toCurrency,
+                        currencies = state.currencies
                     )
                     Timber.tag("ConversionDashboardViewModel").d("currencies - " + state.currencies)
                     Timber.tag("ConversionDashboardViewModel")
-                        .d("Conversion result: " + conversionResult + " from " + event.fromCurrency + " to " + event.toCurrency + " " + "amount: " + amount + " value: " + event.value)
-                    state = state.copy(receiveVolume = (conversionResult).toString())
+                        .d("Conversion result: " + amountAfterConvertion + " from " + event.fromCurrency + " to " + event.toCurrency + " " + "amount: " + amountAfterConvertion + " value: " + event.value)
+                    state = state.copy(receiveVolume = "+$amountAfterConvertion")
                 }
             }
 
@@ -92,6 +73,7 @@ class ConversionDashboardViewModel @Inject constructor(
                 viewModelScope.launch {
                     val currencies = currencyConverterUseCases.getCurrenciesUseCase().getOrNull()?: emptyMap()
                     state = state.copy(currencies = currencies)
+                    Log.d("ConversionDashboardViewModel", "currencies - " + currencies)
                 }
             }
 

@@ -2,29 +2,26 @@ package com.vikravch.exchangeapp.currency_converter.domain.use_case
 
 import com.vikravch.exchangeapp.currency_converter.domain.model.Transaction
 import com.vikravch.exchangeapp.currency_converter.domain.repository.AmountRepository
-import com.vikravch.exchangeapp.currency_converter.domain.repository.ExchangeRepository
 import com.vikravch.exchangeapp.currency_converter.domain.repository.TransactionsHistoryRepository
 
-class ConvertAmountUseCase(
+class ConvertAmountProcessingUseCase(
     private val amountRepository: AmountRepository,
     private val transactionsHistoryRepository: TransactionsHistoryRepository
 ) {
-    suspend operator fun invoke(amount: Double, rate: Double, from: String, to: String, amountEUR: Double): Result<String> {
-        val calculateConvertedAmountUseCase = CalculateConvertedAmountUseCase()
+    operator fun invoke(convertedAmount: Double, from: String, to: String): Result<String> {
         val amountInBaseCurrency = amountRepository.getAmount(from)
-        if(amountInBaseCurrency < amount) {
+        if(amountInBaseCurrency < convertedAmount) {
             return Result.failure(IllegalArgumentException("Not enough money"))
         }
 
         val numberOfTransactions:Int = transactionsHistoryRepository.getNumberOfTransactions().getOrNull() ?: 0
         val feeAmount = getFeeWithNumberOfTransactions(numberOfTransactions)
-        /*val rate = exchangeRepository.getRates(from)[to]?.rate ?: 1.0*/
-        val convertedAmount = calculateConvertedAmountUseCase(amountEUR, rate, feeAmount)
 
-        val newAmountInBaseCurrency = amountInBaseCurrency - amount
-        val newAmount = amountRepository.getAmount(to) + convertedAmount
+        val convertedAmountAfterFee = Math.round((convertedAmount - convertedAmount * (feeAmount / 100))*100.0)/100.0
+        val newAmountInBaseCurrency = amountInBaseCurrency - convertedAmountAfterFee
+        val newAmount = amountRepository.getAmount(to) + convertedAmountAfterFee
         amountRepository.setAmount(mapOf(from to newAmountInBaseCurrency, to to newAmount))
-        transactionsHistoryRepository.addTransaction(Transaction(amount, from, to))
+        transactionsHistoryRepository.addTransaction(Transaction(convertedAmountAfterFee, from, to))
         return Result.success("Updated!!")
     }
 

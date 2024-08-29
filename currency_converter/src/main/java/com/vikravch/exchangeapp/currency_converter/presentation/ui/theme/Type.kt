@@ -1,4 +1,4 @@
-package com.vikravch.exchangeapp.ui.theme
+package com.vikravch.exchangeapp.currency_converter.presentation.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

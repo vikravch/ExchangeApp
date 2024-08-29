@@ -8,4 +8,5 @@ data class ConversionDashboardState(
     val amountsStatus: List<Amount> = emptyList(),
     val currencies: Map<String, Currency> = emptyMap(),
     val receiveVolume: String = "0.0",
+    val conversionResultMessage: String = "",
 )

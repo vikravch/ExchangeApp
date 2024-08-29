@@ -85,12 +85,6 @@ object ConvertDashboardModule {
         return AmountPreferencesRepository(sharedPreferences)
     }
 
-/*    @Provides
-    @Singleton
-    fun provideExchangeRepository(): ExchangeRepository {
-        return ExchangeFakeRepository()
-    }*/
-
    @Provides
     @Singleton
     fun provideTransactionHistoryRepository(

@@ -18,7 +18,7 @@ fun main(){
     )
     val calculateUniversalUseCase = CalculateUniversalUseCase()
     runBlocking {
-        println(convertAmountProcessingUseCase(200.0, "EUR", "USD"))
+        println(convertAmountProcessingUseCase(200.0, 200.0,"EUR", "USD"))
         println(amountRepository.getAmounts())
         val rates = exchangeRepository.getRates().getOrNull()?: emptyMap()
         println("1000 EUR to USD - "+

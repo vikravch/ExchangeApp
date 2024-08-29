@@ -11,4 +11,5 @@ sealed class ConversionDashboardEvent {
 
     data object GetCurrencies : ConversionDashboardEvent()
     data object ResetBalances : ConversionDashboardEvent()
+    data class UpdateConversionResultMessage(val message: String) : ConversionDashboardEvent()
 }

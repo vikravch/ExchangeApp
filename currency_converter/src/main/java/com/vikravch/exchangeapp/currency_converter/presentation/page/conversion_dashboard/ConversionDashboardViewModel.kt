@@ -1,6 +1,5 @@
 package com.vikravch.exchangeapp.currency_converter.presentation.page.conversion_dashboard
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -42,15 +41,19 @@ class ConversionDashboardViewModel @Inject constructor(
                     )
 
                     val conversionResponse = currencyConverterUseCases.convertAmountProcessingUseCase(
+                        fromAmount = event.amount,
                         from = event.fromCurrency,
                         to = event.toCurrency,
                         convertedAmount = amountAfterConvertion
                     )
                     if (conversionResponse.isSuccess) {
-                        _uiEvent.send(UiEvent.ConversionSuccess("Conversion successful"))
+                        state = state.copy(conversionResultMessage = conversionResponse.getOrNull()?: "")
+                        val amounts = currencyConverterUseCases.getAmountsUseCase().getOrNull()?: emptyList()
+                        state = state.copy(amountsStatus = amounts)
                     } else {
-                        _uiEvent.send(UiEvent.ConversionError("Conversion failed"))
+                        state = state.copy(conversionResultMessage = conversionResponse.exceptionOrNull()?.message?: "")
                     }
+
                 }
             }
 
@@ -73,7 +76,6 @@ class ConversionDashboardViewModel @Inject constructor(
                 viewModelScope.launch {
                     val currencies = currencyConverterUseCases.getCurrenciesUseCase().getOrNull()?: emptyMap()
                     state = state.copy(currencies = currencies)
-                    Log.d("ConversionDashboardViewModel", "currencies - " + currencies)
                 }
             }
 
@@ -83,6 +85,10 @@ class ConversionDashboardViewModel @Inject constructor(
                     val amounts = currencyConverterUseCases.getAmountsUseCase().getOrNull()?: emptyList()
                     state = state.copy(amountsStatus = amounts)
                 }
+            }
+
+            is ConversionDashboardEvent.UpdateConversionResultMessage -> {
+                state = state.copy(conversionResultMessage = event.message)
             }
         }
     }

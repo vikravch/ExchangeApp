@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.vikravch.exchangeapp.currency_converter.R
@@ -47,10 +48,8 @@ fun CurrencySpinner(
 
     val constraintModifier = modifier
         .background(
-            shape = RoundedCornerShape(16.dp),
             color = Color.Transparent
         )
-        .border(2.dp, White, RoundedCornerShape(16.dp))
 
     ExchangeAppTheme {
         Box(modifier = constraintModifier) {
@@ -80,7 +79,6 @@ fun CurrencySpinner(
                         shape = RoundedCornerShape(16.dp),
                         color = Color.Transparent
                     )
-                    .border(2.dp, White, RoundedCornerShape(20.dp)),
             ) {
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -98,7 +96,8 @@ fun CurrencySpinner(
                             modifier = Modifier
                                 .weight(1f)
                                 .padding(horizontal = 16.dp, vertical = 8.dp),
-                            color = Color.Black
+                            color = Color.Black,
+                            fontWeight = FontWeight.Bold
                         )
                     } else {
                         Text(
@@ -106,6 +105,8 @@ fun CurrencySpinner(
                             modifier = Modifier
                                 .weight(1f)
                                 .padding(horizontal = 16.dp, vertical = 8.dp),
+                            color = Color.Black,
+                            fontWeight = FontWeight.Bold
                         )
                     }
 

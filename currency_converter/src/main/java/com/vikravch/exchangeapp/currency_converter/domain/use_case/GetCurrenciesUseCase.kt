@@ -8,10 +8,6 @@ class GetCurrenciesUseCase(
 ) {
     suspend operator fun invoke(): Result<Map<String, Currency>> {
         val result = exchangeRepository.getRates()
-        return if(result.isEmpty()) {
-            Result.failure(IllegalArgumentException("No currencies found"))
-        } else {
-            Result.success(result)
-        }
+        return result
     }
 }

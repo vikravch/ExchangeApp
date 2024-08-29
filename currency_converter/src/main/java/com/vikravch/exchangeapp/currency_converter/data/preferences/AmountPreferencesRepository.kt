@@ -1,8 +1,8 @@
 package com.vikravch.exchangeapp.currency_converter.data.preferences
 
 import android.content.SharedPreferences
-import android.util.Log
 import com.vikravch.exchangeapp.currency_converter.domain.repository.AmountRepository
+import timber.log.Timber
 
 class AmountPreferencesRepository(
     private val sharedPreferences: SharedPreferences
@@ -10,12 +10,12 @@ class AmountPreferencesRepository(
     override fun getAmounts(): Map<String, Double> {
         val resultMap = mutableMapOf<String, Double>()
         val stringSet = sharedPreferences.getStringSet("amounts", emptySet())
-        Log.d("AmountPreferencesRepository", "getAmounts: $stringSet")
+        Timber.tag("AmountPreferencesRepository").d("getAmounts: " + stringSet)
         stringSet?.forEach { itemFromPreference ->
             val itemsForAdd = itemFromPreference.split(":")
             resultMap[itemsForAdd[0]] = itemsForAdd[1].toDoubleOrNull()?:0.0
         }
-        Log.d("AmountPreferencesRepository", "getAmounts: $resultMap")
+        Timber.tag("AmountPreferencesRepository").d("getAmounts: " + resultMap)
         return resultMap
     }
 
@@ -25,11 +25,11 @@ class AmountPreferencesRepository(
 
     override fun setAmount(amount: Map<String, Double>) {
         val currentAmount = getAmounts().toMutableMap()
-        Log.d("AmountPreferencesRepository", "setAmount before: $currentAmount")
+        Timber.tag("AmountPreferencesRepository").d("setAmount before: " + currentAmount)
         currentAmount.putAll(amount)
-        Log.d("AmountPreferencesRepository", "setAmount after put: $currentAmount")
+        Timber.tag("AmountPreferencesRepository").d("setAmount after put: " + currentAmount)
         val amounts = currentAmount.entries.map{ entry -> "${entry.key}:${entry.value}" }.toSet()
-        Log.d("AmountPreferencesRepository", "setAmount: $amounts")
+        Timber.tag("AmountPreferencesRepository").d("setAmount: " + amounts)
         sharedPreferences.edit().putStringSet("amounts",amounts).apply()
     }
 

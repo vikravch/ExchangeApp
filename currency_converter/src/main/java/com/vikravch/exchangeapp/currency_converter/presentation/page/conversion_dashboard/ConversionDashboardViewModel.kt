@@ -1,6 +1,5 @@
 package com.vikravch.exchangeapp.currency_converter.presentation.page.conversion_dashboard
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -11,6 +10,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -81,10 +81,9 @@ class ConversionDashboardViewModel @Inject constructor(
                         rate = state.currencies[event.toCurrency]?.rate ?: 0.0,
                         feeAmount = 0.0
                     )
-                    Log.d("ConversionDashboardViewModel", "currencies - ${state.currencies}")
-                    Log.d("ConversionDashboardViewModel",
-                        "Conversion result: $conversionResult from ${event.fromCurrency} to ${event.toCurrency} " +
-                                "amount: $amount value: ${event.value}")
+                    Timber.tag("ConversionDashboardViewModel").d("currencies - " + state.currencies)
+                    Timber.tag("ConversionDashboardViewModel")
+                        .d("Conversion result: " + conversionResult + " from " + event.fromCurrency + " to " + event.toCurrency + " " + "amount: " + amount + " value: " + event.value)
                     state = state.copy(receiveVolume = (conversionResult).toString())
                 }
             }

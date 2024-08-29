@@ -2,10 +2,8 @@ package com.vikravch.exchangeapp.currency_converter.presentation.page.conversion
 
 import CurrencySpinner
 import CurrencySpinnerData
-import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -27,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.vikravch.exchangeapp.currency_converter.presentation.ui.theme.ExchangeAppTheme
 import kotlinx.coroutines.delay
+import timber.log.Timber
 
 @Composable
 fun ConversionDashboardPage(
@@ -40,11 +39,11 @@ fun ConversionDashboardPage(
         viewModel.uiEvent.collect {
             when (it) {
                 is ConversionDashboardViewModel.UiEvent.ConversionSuccess -> {
-                    Log.d("ConversionDashboardPage", "Conversion success: ${it.message}")
+                    Timber.tag("ConversionDashboardPage").d("Conversion success: " + it.message)
                     viewModel.onEvent(ConversionDashboardEvent.GetAmounts)
                 }
                 is ConversionDashboardViewModel.UiEvent.ConversionError -> {
-                    Log.d("ConversionDashboardPage", "Conversion error: ${it.message}")
+                    Timber.tag("ConversionDashboardPage").d("Conversion error: " + it.message)
                     viewModel.onEvent(ConversionDashboardEvent.GetAmounts)
                 }
             }
@@ -63,7 +62,8 @@ fun ConversionDashboardPage(
         state = viewModel.state,
         submitConversion = {
                 amount, fromCurrency, toCurrency ->
-            Log.d("ConversionDashboardPage", "amount: $amount, fromCurrency: $fromCurrency, toCurrency: $toCurrency")
+            Timber.tag("ConversionDashboardPage")
+                .d("amount: " + amount + ", fromCurrency: " + fromCurrency + ", toCurrency: " + toCurrency)
             viewModel.onEvent(
                 ConversionDashboardEvent.ConvertAmount(
                     amount.toDoubleOrNull()?:0.0,
@@ -87,8 +87,8 @@ fun ConversionDashboardPageUI(
     resetBalances: () -> Unit = {}
 ) {
     val (amount, setAmount) = remember { mutableStateOf("") }
-    val (fromCurrency, setFromCurrency) = remember { mutableStateOf("") }
-    val (toCurrency, setToCurrency) = remember { mutableStateOf("") }
+    val (fromCurrency, setFromCurrency) = remember { mutableStateOf("EUR") }
+    val (toCurrency, setToCurrency) = remember { mutableStateOf("USD") }
 
     val currencySpinnerData = state.currencies.map { CurrencySpinnerData(it.key, it.key) }.toMutableList()
     currencySpinnerData.add(0, CurrencySpinnerData("EUR", "EUR"))
@@ -130,7 +130,8 @@ fun ConversionDashboardPageUI(
             )
             CurrencySpinner(
                 modifier = Modifier
-                    .padding(horizontal = 8.dp).width(100.dp),
+                    .padding(horizontal = 8.dp)
+                    .width(100.dp),
                 list = currencySpinnerData,
                 preselected = CurrencySpinnerData(fromCurrency,fromCurrency),
                 onSelectionChanged = {
@@ -155,7 +156,8 @@ fun ConversionDashboardPageUI(
                 text = state.receiveVolume)
             CurrencySpinner(
                 modifier = Modifier
-                    .padding(horizontal = 8.dp).width(100.dp),
+                    .padding(horizontal = 8.dp)
+                    .width(100.dp),
                 list = currencySpinnerData,
                 preselected = CurrencySpinnerData(toCurrency,toCurrency),
                 onSelectionChanged = {

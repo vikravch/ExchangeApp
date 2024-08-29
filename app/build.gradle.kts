@@ -74,6 +74,8 @@ dependencies {
     implementation("com.google.dagger:hilt-android:2.48")
     implementation("androidx.hilt:hilt-navigation-compose:1.0.0-alpha03")
     kapt("com.google.dagger:hilt-android-compiler:2.48")
+    //Timber
+    implementation("com.jakewharton.timber:timber:5.0.1")
 }
 kapt {
     correctErrorTypes = true
